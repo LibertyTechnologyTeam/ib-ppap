@@ -36,6 +36,7 @@ jobs:
           python-version: "3.13"
       - name: Install dependencies
         run: |
+          ls
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run script
@@ -43,26 +44,26 @@ jobs:
           ls
           python ./crawlInstagram.py
 
-  save-crawler-youtube:
-    needs: save-input-data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run script
-        run: |
-          node ./src/crawl-yt-profile.js
+  # save-crawler-youtube:
+  #   needs: save-input-data
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run script
+  #       run: |
+  #         node ./src/crawl-yt-profile.js
 
-  save-crawler-facebook:
-    needs: save-input-data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run script
-        run: |
-          node ./src/crawl-fb-profile.js
+  # save-crawler-facebook:
+  #   needs: save-input-data
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run script
+  #       run: |
+  #         node ./src/crawl-fb-profile.js
 
-  save-crawler-tiktok:
-    needs: save-input-data
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run script
-        run: |
-          node ./src/crawl-tt-profile.js
+  # save-crawler-tiktok:
+  #   needs: save-input-data
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run script
+  #       run: |
+  #         node ./src/crawl-tt-profile.js
