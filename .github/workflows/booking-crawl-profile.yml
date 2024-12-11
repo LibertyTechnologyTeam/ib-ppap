@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: "InfluenceBooking/crawler"
-          token: ${{ env.GH_PAT }}
+          token: ${{ secrets.GH_PAT }}
           ref: "main"
       - name: Setup Node.js
         uses: actions/setup-node@v4
