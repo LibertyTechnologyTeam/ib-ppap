@@ -28,7 +28,6 @@ jobs:
           node ./src/write-input-data.js
       - name: Run crawl youtube
         run: |
-          node ./src/crawl-fb-profile.js
           node ./src/crawl-tt-profile.js
 
       # - uses: actions/setup-python@v5
