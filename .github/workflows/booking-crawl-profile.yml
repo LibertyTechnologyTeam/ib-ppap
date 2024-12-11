@@ -26,9 +26,6 @@ jobs:
         run: |
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
