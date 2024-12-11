@@ -5,8 +5,6 @@ on:
       reason:
         description: "Fill reason here!!!!!!"
         required: false
-env:
-  GH_PAT: ${{ secrets.GH_PAT }}
 jobs:
   save-input-data:
     runs-on: ubuntu-latest
