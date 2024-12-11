@@ -24,6 +24,7 @@ jobs:
           npm install
       - name: Run script
         run: |
+          echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
 
   save-crawler-instagram:
