@@ -26,18 +26,20 @@ jobs:
         run: |
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Install dependencies
+      - name: Run crawl youtube
         run: |
-          ls
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Run script
-        run: |
-          ls
-          python ./crawlInstagram.py
+          node ./src/crawl-yt-profile.js
+      # - uses: actions/setup-python@v5
+      #   with:
+      #     python-version: "3.13"
+      # - name: Install dependencies
+      #   run: |
+      #     ls
+      #     python -m pip install --upgrade pip
+      #     pip install -r requirements.txt
+      # - name: Run script
+      #   run: |
+      #     python ./crawlInstagram.py
 
   # save-crawler-youtube:
   #   needs: save-input-data
