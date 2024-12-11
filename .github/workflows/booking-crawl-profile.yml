@@ -27,10 +27,6 @@ jobs:
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
 
-  save-crawler-instagram:
-    needs: save-input-data
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - uses: actions/setup-python@v5
