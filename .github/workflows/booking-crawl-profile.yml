@@ -35,11 +35,15 @@ jobs:
         run: |
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
+          ls
       - name: Cache crawler data
         uses: actions/cache@v3
         with:
           path: |
-            input_*.json
+            input_influencers_facebook.json
+            input_influencers_instagram.json
+            input_influencers_tiktok.json
+            input_influencers_youtube.json
           key: ${{ steps.generate-cache-key.outputs.key }}
 
   crawl-profiles:
@@ -79,7 +83,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            input_*.json
+            input_influencers_facebook.json
+            input_influencers_instagram.json
+            input_influencers_tiktok.json
+            input_influencers_youtube.json
           key: ${{ needs.get-profile-data.outputs.cache-key }}
 
       - name: Setup Node.js
