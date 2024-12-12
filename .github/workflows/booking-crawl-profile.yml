@@ -65,6 +65,8 @@ jobs:
             script: ./src/crawl-ig-profile.js
           - platform: tiktok
             script: ./src/crawl-tt-profile.js
+          - platform: youtube
+            script: ./src/crawl-yt-profile.js
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
