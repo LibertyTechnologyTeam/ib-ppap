@@ -52,7 +52,7 @@ jobs:
     name: Crawl Social Profiles
     strategy:
       matrix:
-        platform: ["facebook", "instagram", "tiktok"]
+        platform: ["facebook", "instagram", "tiktok", "youtube"]
         include:
           - platform: facebook
             script: ./src/crawl-fb-profile.js
@@ -75,7 +75,6 @@ jobs:
         id: get-cache-key
         run: |
           echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
-          ls
 
       # - name: Wait for input data
       #   uses: fountainhead/action-wait-for-check@v1.1.0
@@ -104,5 +103,4 @@ jobs:
 
       - name: Run script
         run: |
-          ls
           node ${{ matrix.script }}
