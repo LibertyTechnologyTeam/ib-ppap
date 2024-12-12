@@ -9,6 +9,8 @@ jobs:
   get-profile-data:
     name: Get Profile Input Data
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.generate-cache-key.outputs.key }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
