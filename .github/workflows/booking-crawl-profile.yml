@@ -71,13 +71,18 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
+      - name: Get cache key
+        id: get-cache-key
+        run: |
+          echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
+          ls
 
-      - name: Wait for input data
-        uses: fountainhead/action-wait-for-check@v1.1.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: get-profile-data
-          ref: ${{ github.sha }}
+      # - name: Wait for input data
+      #   uses: fountainhead/action-wait-for-check@v1.1.0
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     checkName: get-profile-data
+      #     ref: ${{ github.sha }}
 
       - name: Restore crawler data
         uses: actions/cache@v3
