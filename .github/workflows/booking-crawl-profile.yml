@@ -6,7 +6,8 @@ on:
         description: "Fill reason here!!!!!!"
         required: false
 jobs:
-  save-input-data:
+  get-profile-data:
+    name: Get Profile Input Data
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository
@@ -15,6 +16,20 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
+      # Generate a unique cache key
+      - name: Generate cache key
+        id: generate-cache-key
+        run: |
+          echo "key=${{ runner.os }}-crawler-data-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -26,48 +41,73 @@ jobs:
         run: |
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
-      # - name: Run script Instagram
-      #   run: |
-      #     node ./src/crawl-ig-profile.js
+      - name: Cache crawler data
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./input_influencers_facebook.json
+            ./input_influencers_instagram.json
+            ./input_influencers_tiktok.json
+            ./input_influencers_youtube.json
+          key: ${{ steps.generate-cache-key.outputs.key }}
 
-      - name: Run script Facebook
+  crawl-profiles:
+    needs: get-profile-data
+    runs-on: ubuntu-latest
+    name: Crawl Social Profiles
+    strategy:
+      matrix:
+        platform: ["facebook", "instagram", "tiktok"]
+        include:
+          - platform: facebook
+            script: ./src/crawl-fb-profile.js
+          - platform: instagram
+            script: ./src/crawl-ig-profile.js
+          - platform: tiktok
+            script: ./src/crawl-tt-profile.js
+      # Allow all matrix jobs to continue even if one fails
+      fail-fast: false
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Wait for input data
+        uses: fountainhead/action-wait-for-check@v1.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: get-profile-data
+          ref: ${{ github.sha }}
+
+      - name: Restore crawler data
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./input_influencers_facebook.json
+            ./input_influencers_instagram.json
+            ./input_influencers_tiktok.json
+            ./input_influencers_youtube.json
+          key: ${{ needs.get-profile-data.outputs.cache-key }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run script
         run: |
-          node ./src/crawl-fb-profile.js
-
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.13"
-      # - name: Install dependencies
-      #   run: |
-      #     ls
-      #     python -m venv py-crawl
-      #     source py-crawl/bin/activate
-      #     pip install -r requirements.txt
-      #     python crawlInstagram.py
-      # - name: Run script Instagram
-      #   run: |
-      #     python ./crawlInstagram.py
-
-  # save-crawler-youtube:
-  #   needs: save-input-data
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Run script
-  #       run: |
-  #         node ./src/crawl-yt-profile.js
-
-  # save-crawler-facebook:
-  #   needs: save-input-data
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Run script
-  #       run: |
-  #         node ./src/crawl-fb-profile.js
-
-  # save-crawler-tiktok:
-  #   needs: save-input-data
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Run script
-  #       run: |
-  #         node ./src/crawl-tt-profile.js
+          node ${{ matrix.script }}
