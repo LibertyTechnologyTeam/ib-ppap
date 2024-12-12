@@ -26,9 +26,13 @@ jobs:
         run: |
           echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
           node ./src/write-input-data.js
-      - name: Run script Instagram
+      # - name: Run script Instagram
+      #   run: |
+      #     node ./src/crawl-ig-profile.js
+
+      - name: Run script Facebook
         run: |
-          node ./src/crawl-ig-profile.js
+          node ./src/crawl-fb-profile.js
 
       # - uses: actions/setup-python@v5
       #   with:
