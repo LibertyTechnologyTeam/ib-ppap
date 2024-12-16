@@ -5,6 +5,7 @@ on:
       reason:
         description: "Fill reason here!!!!!!"
         required: false
+
 jobs:
   get-profile-data:
     name: Get Profile Input Data
@@ -35,7 +36,7 @@ jobs:
         run: |
           echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
           node --no-warnings ./src/write-input-data.js
-          ls
+
       - name: Cache crawler data
         uses: actions/cache@v3
         with:
@@ -45,6 +46,7 @@ jobs:
             input_influencers_tiktok.json
             input_influencers_youtube.json
           key: ${{ steps.generate-cache-key.outputs.key }}
+          restore-keys: ${{ runner.os }}-crawler-data-
 
   crawl-profiles:
     needs: get-profile-data
@@ -110,4 +112,4 @@ jobs:
           echo "platform=${{ matrix.platform }}" 
           echo "version=${{ matrix.version }}" 
           echo "region=${{ matrix.region }}"
-          echo "OK Test...."
+          echo "import { writeOutputData } from "./src/write-output-data.js"; writeOutputData("${{ matrix.platform }}", ${{ matrix.version }}, "${{ matrix.region }}");"
