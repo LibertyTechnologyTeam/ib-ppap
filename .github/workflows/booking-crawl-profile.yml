@@ -62,10 +62,10 @@ jobs:
       #     - platform: youtube
       #       script: ./src/crawl-yt-profile.js
       matrix:
-        platform: ["facebook"]
-        # platform: ["facebook", "instagram", "tiktok", "youtube"]
-        # version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-        version: [1]
+        platform: ["facebook", "instagram", "tiktok", "youtube"]
+        version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        # platform: ["facebook"]
+        # version: [1]
         region: ["us-east", "us-west", "eu-central", "ap-southeast"]
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
@@ -109,4 +109,5 @@ jobs:
           echo "version=${{ matrix.version }}" 
           echo "region=${{ matrix.region }}"
           echo 'import { writeOutputData } from "./src/write-output-data.js"; writeOutputData("${{ matrix.platform }}", ${{ matrix.version }}, "${{ matrix.region }}");' > ./main.js
+          echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
           node --no-warnings main.js
