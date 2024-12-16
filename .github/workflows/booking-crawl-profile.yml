@@ -33,8 +33,8 @@ jobs:
           npm install
       - name: Run script
         run: |
-          echo "GET_INFLUENCERS_URL=https://api-dev.theinfluence.ai/api/influencers/social-links" >> .env
-          node ./src/write-input-data.js
+          echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
+          node --no-warnings ./src/write-input-data.js
           ls
       - name: Cache crawler data
         uses: actions/cache@v3
@@ -51,17 +51,21 @@ jobs:
     runs-on: ubuntu-latest
     name: Crawl Social Profiles
     strategy:
+      # matrix:
+      #   platform: ["facebook", "instagram", "tiktok", "youtube"]
+      #   include:
+      #     - platform: facebook
+      #       script: ./src/crawl-fb-profile.js
+      #     - platform: instagram
+      #       script: ./src/crawl-ig-profile.js
+      #     - platform: tiktok
+      #       script: ./src/crawl-tt-profile.js
+      #     - platform: youtube
+      #       script: ./src/crawl-yt-profile.js
       matrix:
         platform: ["facebook", "instagram", "tiktok", "youtube"]
-        include:
-          - platform: facebook
-            script: ./src/crawl-fb-profile.js
-          - platform: instagram
-            script: ./src/crawl-ig-profile.js
-          - platform: tiktok
-            script: ./src/crawl-tt-profile.js
-          - platform: youtube
-            script: ./src/crawl-yt-profile.js
+        version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        region: ["us-east", "us-west", "eu-central", "ap-southeast"]
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
@@ -103,4 +107,7 @@ jobs:
 
       - name: Run script
         run: |
-          node ${{ matrix.script }}
+          echo "platform=${{ matrix.platform }}" 
+          echo "version=${{ matrix.version }}" 
+          echo "region=${{ matrix.region }}"
+          echo "OK Test...."
