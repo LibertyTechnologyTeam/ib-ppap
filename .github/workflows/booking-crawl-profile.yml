@@ -107,3 +107,4 @@ jobs:
           echo "version=${{ matrix.version }}" 
           echo "region=${{ matrix.region }}"
           echo "import { writeOutputData } from "./src/write-output-data.js"; writeOutputData("${{ matrix.platform }}", ${{ matrix.version }}, "${{ matrix.region }}");"
+          node --no-warnings main.js
