@@ -41,10 +41,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            input_influencers_facebook.json
-            input_influencers_instagram.json
-            input_influencers_tiktok.json
-            input_influencers_youtube.json
+            input_influencers.json
           key: ${{ steps.generate-cache-key.outputs.key }}
           restore-keys: ${{ runner.os }}-crawler-data-
 
@@ -93,10 +90,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            input_influencers_facebook.json
-            input_influencers_instagram.json
-            input_influencers_tiktok.json
-            input_influencers_youtube.json
+            input_influencers.json
           key: ${{ needs.get-profile-data.outputs.cache-key }}
 
       - name: Setup Node.js
