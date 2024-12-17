@@ -5,7 +5,8 @@ on:
       reason:
         description: "Fill reason here!!!!!!"
         required: false
-
+  repository_dispatch:
+    types: [schedule_save_crawler_data]
 jobs:
   get-profile-data:
     name: Get Profile Input Data
@@ -36,14 +37,4 @@ jobs:
         run: |
           echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
           node --no-warnings ./src/write-input-data.js
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-      - name: Run script
-        run: |
-          ls
-          python ./crawlInstagram.py
+          echo --no-warnings ./src/crawl-ig-profile.js
