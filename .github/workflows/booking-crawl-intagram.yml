@@ -37,4 +37,5 @@ jobs:
         run: |
           echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
           node --no-warnings ./src/write-input-data.js
-          echo --no-warnings ./src/crawl-ig-profile.js
+          node --no-warnings ./src/crawl-ig-profile.js
+          echo "Size: ${{ github.event.client_payload }}"
