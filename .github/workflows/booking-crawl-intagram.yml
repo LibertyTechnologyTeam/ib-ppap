@@ -1,0 +1,60 @@
+name: Project Influence Instagram Schedule Save Crawler data
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Fill reason here!!!!!!"
+        required: false
+
+jobs:
+  get-profile-data:
+    name: Get Profile Input Data
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.generate-cache-key.outputs.key }}
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
+      # Generate a unique cache key
+      - name: Generate cache key
+        id: generate-cache-key
+        run: |
+          echo "key=${{ runner.os }}-crawler-data-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0"
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Run script
+        run: |
+          echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
+          node --no-warnings ./src/write-input-data.js
+
+  crawl-instagram:
+    needs: get-profile-data
+    runs-on: "ubuntu-latest"
+    name: Crawl Instagram
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run script
+        run: |
+          python crawlInstagram.py
