@@ -5,7 +5,13 @@ on:
       reason:
         description: "Fill reason here!!!!!!"
         required: false
-
+  repository_dispatch:
+    types: [schedule_save_crawler_data]
+env:
+  API_INFLUENCERS_URL: https://api-dev.theinfluence.ai
+  GH_PAT: ${{ secrets.GH_PAT }}
+  SIZE: ${{ github.event.client_payload.size }}
+  PACKAGE_PATH: ${{ github.event.client_payload.package_path }}
 jobs:
   get-profile-data:
     name: Get Profile Input Data
@@ -35,7 +41,8 @@ jobs:
       - name: Run script
         run: |
           echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
-          node --no-warnings ./src/write-input-data.js
+          echo 'import { writeInputData } from "./src/write-input-data.js"; writeInputData(${{ env.SIZE }}, ${{ env.PACKAGE_PATH }});' > ./main.js
+          node --no-warnings ./main.js
 
       - name: Cache crawler data
         uses: actions/cache@v3
@@ -62,9 +69,8 @@ jobs:
       #     - platform: youtube
       #       script: ./src/crawl-yt-profile.js
       matrix:
-        # platform: ["facebook", "instagram", "tiktok", "youtube"]
+        platform: ["facebook", "instagram", "tiktok", "youtube"]
         # version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-        platform: ["tiktok", "youtube"]
         version: [1]
         region: ["us-east", "us-west", "eu-central", "ap-southeast"]
       # Allow all matrix jobs to continue even if one fails
@@ -81,13 +87,6 @@ jobs:
         run: |
           echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
 
-      # - name: Wait for input data
-      #   uses: fountainhead/action-wait-for-check@v1.1.0
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
-      #     checkName: get-profile-data
-      #     ref: ${{ github.sha }}
-
       - name: Restore crawler data
         uses: actions/cache@v3
         with:
@@ -103,7 +102,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run script
+      - name: Run crawl profile
         run: |
           echo "platform=${{ matrix.platform }}" 
           echo "version=${{ matrix.version }}" 
