@@ -36,18 +36,6 @@ jobs:
         run: |
           echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
           node --no-warnings ./src/write-input-data.js
-
-  crawl-instagram:
-    needs: get-profile-data
-    runs-on: "ubuntu-latest"
-    name: Crawl Instagram
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          repository: "InfluenceBooking/crawler"
-          token: ${{ secrets.GH_PAT }}
-          ref: "main"
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
