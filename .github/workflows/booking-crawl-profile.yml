@@ -8,16 +8,19 @@ on:
   repository_dispatch:
     types: [schedule_save_crawler_data]
 env:
-  API_INFLUENCERS_URL: https://api-dev.theinfluence.ai
+  API_INFLUENCERS_URL: ${{ github.event.client_payload.api_url}}
   GH_PAT: ${{ secrets.GH_PAT }}
   SIZE: ${{ github.event.client_payload.size }}
   PACKAGE_PATH: ${{ github.event.client_payload.package_path }}
+  MATRIX_SIZE: ${{ github.event.client_payload.matrix_size }}
+  SIZE_PER_MATRIX: ${{ github.event.client_payload.size_per_matrix }}
 jobs:
   get-profile-data:
     name: Get Profile Input Data
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
+      matrix-size: ${{ steps.calculate-matrix.outputs.index }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -40,10 +43,17 @@ jobs:
           npm install
       - name: Run script
         run: |
-          echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
+          echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           echo 'import { writeInputData } from "./src/write-input-data.js"; writeInputData(${{ env.SIZE }}, ${{ env.PACKAGE_PATH }});' > ./main.js
           node --no-warnings ./main.js
-
+      - name: Calculate matrix
+        id: calculate-matrix
+        run: |
+          echo "["
+          for i in $(seq 1 ${{ env.MATRIX_SIZE }}); do
+            echo "  {index: $i},"
+          done
+          echo "]" >> $GITHUB_OUTPUT
       - name: Cache crawler data
         uses: actions/cache@v3
         with:
@@ -57,22 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Crawl Social Profiles
     strategy:
-      # matrix:
-      #   platform: ["facebook", "instagram", "tiktok", "youtube"]
-      #   include:
-      #     - platform: facebook
-      #       script: ./src/crawl-fb-profile.js
-      #     - platform: instagram
-      #       script: ./src/crawl-ig-profile.js
-      #     - platform: tiktok
-      #       script: ./src/crawl-tt-profile.js
-      #     - platform: youtube
-      #       script: ./src/crawl-yt-profile.js
-      matrix:
-        platform: ["facebook", "instagram", "tiktok", "youtube"]
-        version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-        # version: [1]
-        region: ["us-east", "us-west", "eu-central", "ap-southeast"]
+      matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix-size) }}
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
@@ -104,9 +99,7 @@ jobs:
 
       - name: Run crawl profile
         run: |
-          echo "platform=${{ matrix.platform }}" 
-          echo "version=${{ matrix.version }}" 
-          echo "region=${{ matrix.region }}"
-          echo 'import { writeOutputData } from "./src/write-output-data.js"; writeOutputData("${{ matrix.platform }}", ${{ matrix.version }}, "${{ matrix.region }}");' > ./main.js
-          echo "API_INFLUENCERS_URL=https://api-dev.theinfluence.ai" >> .env
+          echo "platform=${{ matrix.index }}" 
+          echo 'import { writeOutputByIndex } from "./src/write-output-data.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
+          echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           node --no-warnings main.js
