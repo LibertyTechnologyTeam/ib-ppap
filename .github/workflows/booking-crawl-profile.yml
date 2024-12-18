@@ -70,8 +70,8 @@ jobs:
       #       script: ./src/crawl-yt-profile.js
       matrix:
         platform: ["facebook", "instagram", "tiktok", "youtube"]
-        # version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-        version: [1]
+        version: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        # version: [1]
         region: ["us-east", "us-west", "eu-central", "ap-southeast"]
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
