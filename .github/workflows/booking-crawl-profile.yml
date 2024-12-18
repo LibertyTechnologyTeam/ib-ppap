@@ -49,9 +49,9 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          echo "["
+          echo "[" >> $GITHUB_OUTPUT
           for i in $(seq 1 ${{ env.MATRIX_SIZE }}); do
-            echo "  {index: $i},"
+            echo "  {index: $i}," >> $GITHUB_OUTPUT
           done
           echo "]" >> $GITHUB_OUTPUT
       - name: Cache crawler data
