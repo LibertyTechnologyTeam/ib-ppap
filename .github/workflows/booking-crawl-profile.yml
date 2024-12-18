@@ -56,13 +56,13 @@ jobs:
       - name: Show matrix
         run: |
           echo ${{ steps.calculate-matrix.outputs.matrix }}
-      - name: Cache crawler data
-        uses: actions/cache@v3
-        with:
-          path: |
-            input_influencers.json
-          key: ${{ steps.generate-cache-key.outputs.key }}
-          restore-keys: ${{ runner.os }}-crawler-data-
+      # - name: Cache crawler data
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       input_influencers.json
+      #     key: ${{ steps.generate-cache-key.outputs.key }}
+      #     restore-keys: ${{ runner.os }}-crawler-data-
 
   crawl-profiles:
     needs: get-profile-data
