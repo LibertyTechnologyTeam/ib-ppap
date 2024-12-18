@@ -28,7 +28,7 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          echo "[" > matrix.json
+          echo "OK" > matrix.json
         #   for ((i=0; i<5; i++)); do
         #    echo "  {\"index\": $i}," >> matrix.json
         #   done
