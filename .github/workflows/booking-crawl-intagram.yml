@@ -32,7 +32,6 @@ jobs:
           for ((i=0; i<5; i++)); do
            echo "  {\"index\": $i}," >> matrix.json
           done
-          sed -i '$ s/,$//' matrix.json # Remove the trailing comma from the last element
           echo "]" >> matrix.json
           cat matrix.json >> $GITHUB_OUTPUT
       - name: Show matrix
