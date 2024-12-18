@@ -60,7 +60,7 @@ jobs:
       #   uses: actions/cache@v3
       #   with:
       #     path: |
-      #       input_influencers.json
+      #       input_influencers_all.json
       #     key: ${{ steps.generate-cache-key.outputs.key }}
       #     restore-keys: ${{ runner.os }}-crawler-data-
 
@@ -69,9 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Crawl Social Profiles
     strategy:
-      # matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
       matrix:
-        index: [0, 1, 2, 3, 4]
+        index: ${{ join(range(0, fromJson(env.MATRIX_SIZE)), ', ') }}
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
