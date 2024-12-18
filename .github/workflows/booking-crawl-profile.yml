@@ -49,6 +49,7 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
+          echo "${{ env.MATRIX_SIZE }}"
           echo "[" >> $GITHUB_OUTPUT
           for i in $(seq 1 ${{ env.MATRIX_SIZE }}); do
             echo "  {index: $i}," >> $GITHUB_OUTPUT
