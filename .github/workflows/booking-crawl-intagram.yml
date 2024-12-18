@@ -30,8 +30,8 @@ jobs:
         run: |
           echo "[" > matrix.json
           for ((i=0; i<5; i++)); do echo "  {\"index\": $i}," >> matrix.json; done
-          echo "]" >> matrix.json
-          cat matrix.json >> $GITHUB_OUTPUT
+          cat matrix.json
+        #   echo "]" >> matrix.json
       - name: Show matrix
         run: |
           echo ${{ steps.calculate-matrix.outputs.matrix-size }}
