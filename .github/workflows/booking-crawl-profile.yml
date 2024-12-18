@@ -50,9 +50,9 @@ jobs:
         id: calculate-matrix
         run: |
           matrix="["
-          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+="  {\"index\": $i},"; done
+          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+=" {\"index\": $i},"; done
           matrix+="]"
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo 'matrix="[{"index": 0}, {"index": 1}, {"index": 2}, {"index": 3}, {"index": 4}]"' >> $GITHUB_OUTPUT
       - name: Show matrix
         run: |
           echo ${{ steps.calculate-matrix.outputs.matrix }}
