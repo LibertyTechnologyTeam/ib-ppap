@@ -69,7 +69,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Crawl Social Profiles
     strategy:
-      matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
+      # matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
+      matrix:
+        index: [0, 1, 2, 3, 4]
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
