@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
-      matrix-size: ${{ steps.calculate-matrix.outputs.index }}
+      matrix: ${{ steps.calculate-matrix.outputs.matrix }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -49,62 +49,59 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          echo '[' > matrix.json
-          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do
-            echo "  {\"index\": $i}," >> matrix.json
-          done
-          sed -i '$ s/,$//' matrix.json # Remove the trailing comma from the last element
-          echo ']' >> matrix.json
-          cat matrix.json >> $GITHUB_OUTPUT
+          matrix="["
+          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+="  {\"index\": $i},"; done
+          matrix+="]"
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
       - name: Show matrix
         run: |
-          echo ${{ steps.calculate-matrix.outputs }}
-      # - name: Cache crawler data
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       input_influencers.json
-      #     key: ${{ steps.generate-cache-key.outputs.key }}
-      #     restore-keys: ${{ runner.os }}-crawler-data-
+          echo ${{ steps.calculate-matrix.outputs.matrix }}
+      - name: Cache crawler data
+        uses: actions/cache@v3
+        with:
+          path: |
+            input_influencers.json
+          key: ${{ steps.generate-cache-key.outputs.key }}
+          restore-keys: ${{ runner.os }}-crawler-data-
 
-  # crawl-profiles:
-  #   needs: get-profile-data
-  #   runs-on: ubuntu-latest
-  #   name: Crawl Social Profiles
-  #   strategy:
-  #     matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix-size) }}
-  #     # Allow all matrix jobs to continue even if one fails
-  #     fail-fast: false
-  #   steps:
-  #     - name: Clone repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         repository: "InfluenceBooking/crawler"
-  #         token: ${{ secrets.GH_PAT }}
-  #         ref: "main"
-  #     - name: Get cache key
-  #       id: get-cache-key
-  #       run: |
-  #         echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
+  crawl-profiles:
+    needs: get-profile-data
+    runs-on: ubuntu-latest
+    name: Crawl Social Profiles
+    strategy:
+      matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
+      # Allow all matrix jobs to continue even if one fails
+      fail-fast: false
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
+      - name: Get cache key
+        id: get-cache-key
+        run: |
+          echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
 
-  #     - name: Restore crawler data
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           input_influencers.json
-  #         key: ${{ needs.get-profile-data.outputs.cache-key }}
+      - name: Restore crawler data
+        uses: actions/cache@v3
+        with:
+          path: |
+            input_influencers.json
+          key: ${{ needs.get-profile-data.outputs.cache-key }}
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20.10.0"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0"
 
-  #     - name: Install dependencies
-  #       run: npm install
+      - name: Install dependencies
+        run: npm install
 
-  #     - name: Run crawl profile
-  #       run: |
-  #         echo "platform=${{ matrix.index }}"
-  #         echo 'import { writeOutputByIndex } from "./src/write-output-data.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
-  #         echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
-  #         node --no-warnings main.js
+      - name: Run crawl profile
+        run: |
+          echo "platform=${{ matrix.index }}"
+          echo 'import { writeOutputByIndex } from "./src/write-output-data.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
+          echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
+          node --no-warnings main.js
