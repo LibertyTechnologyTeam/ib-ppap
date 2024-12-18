@@ -50,9 +50,9 @@ jobs:
         id: calculate-matrix
         run: |
           matrix="["
-          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+=" {\"index\": $i},"; done
+          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+="\"$i\"","; done
           matrix+="]"
-          echo 'matrix="[{"index": 0}, {"index": 1}, {"index": 2}, {"index": 3}, {"index": 4}]"' >> $GITHUB_OUTPUT
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
       - name: Show matrix
         run: |
           echo ${{ steps.calculate-matrix.outputs.matrix }}
@@ -70,7 +70,7 @@ jobs:
     name: Crawl Social Profiles
     strategy:
       matrix:
-        index: ${{ join(range(0, fromJson(env.MATRIX_SIZE)), ', ') }}
+        index: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
