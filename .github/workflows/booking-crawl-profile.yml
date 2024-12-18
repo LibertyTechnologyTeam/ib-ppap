@@ -49,12 +49,12 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          echo "[" > matrix.json
+          echo '[' > matrix.json
           for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do
-           echo "  {\"index\": $i}," >> matrix.json
+            echo "  {\"index\": $i}," >> matrix.json
           done
           sed -i '$ s/,$//' matrix.json # Remove the trailing comma from the last element
-          echo "]" >> matrix.json
+          echo ']' >> matrix.json
           cat matrix.json >> $GITHUB_OUTPUT
       - name: Show matrix
         run: |
