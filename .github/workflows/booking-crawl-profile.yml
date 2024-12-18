@@ -50,7 +50,7 @@ jobs:
         id: calculate-matrix
         run: |
           matrix="["
-          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+="\"$i\"","; done
+          for ((i=0; i<${{ env.MATRIX_SIZE }}; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
       - name: Show matrix
