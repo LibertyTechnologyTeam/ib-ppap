@@ -69,10 +69,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Crawl Social Profiles
     strategy:
-      matrix: ${{ needs.get-profile-data.outputs.matrix }}
+      matrix: ${{ fromJson(needs.get-profile-data.outputs.matrix) }}
       # Allow all matrix jobs to continue even if one fails
       fail-fast: false
     steps:
+      - name: Use matrix
+        run: |
+          echo "Processing index: ${{ matrix.index }}"
       - name: Clone repository
         uses: actions/checkout@v3
         with:
