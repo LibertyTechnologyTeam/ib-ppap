@@ -13,6 +13,9 @@ env:
   SIZE: ${{ github.event.client_payload.size }}
   PACKAGE_PATH: ${{ github.event.client_payload.package_path }}
   SIZE_PER_MATRIX: ${{ github.event.client_payload.size_per_matrix }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID }}
+  TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID }}
 jobs:
   get-profile-data:
     name: Get Profile Input Data
@@ -20,6 +23,7 @@ jobs:
     outputs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
+      message: ${{ steps.message-information.outputs.value }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -27,6 +31,18 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
+      - name: Generate message
+        id: message-information
+        run: |
+          source .github/scripts/utils.sh
+          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+      - name: Notification to telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ env.TELEGRAM_GROUP_ID }}
+          token: ${{ env.TELEGRAM_BOT_TOKEN }}
+          message: "🚀 Start Crawl Social Profile ${{ steps.message-information.outputs.value }}"
+
       # Generate a unique cache key
       - name: Generate cache key
         id: generate-cache-key
@@ -108,3 +124,15 @@ jobs:
           echo 'import { writeOutputByIndex } from "./src/write-output-data.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
           echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           node --no-warnings main.js
+  finish:
+    needs: [get-profile-data, crawl-profiles]
+    if: ${{ needs.crawl-profiles.result == 'success' }}
+    runs-on: ubuntu-latest
+    name: Finish
+    steps:
+      - name: Notification to telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ env.TELEGRAM_GROUP_ID }}
+          token: ${{ env.TELEGRAM_BOT_TOKEN }}
+          message: "🚀 - Finish get profile data... ${needs.get-profile-data.outputs.message}"
