@@ -35,7 +35,6 @@ jobs:
         id: message-information
         run: |
           ls
-          source utils.sh
           echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
       - name: Notification to telegram
         uses: appleboy/telegram-action@master
