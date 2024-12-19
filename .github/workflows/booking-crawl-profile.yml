@@ -138,4 +138,14 @@ jobs:
         with:
           type: topic
           message: "✅- Finish get profile data. ${{needs.get-profile-data.outputs.message}}"
-          # reply_to_message_id: ${{ env.TELEGRAM_TOPIC_ID }}
+  failure:
+    needs: [get-profile-data, crawl-profiles]
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    name: Failure
+    steps:
+      - name: Notification to telegram
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "❌- Error occurred in get profile data. ${{needs.get-profile-data.outputs.message}}"
