@@ -34,6 +34,7 @@ jobs:
       - name: Generate message
         id: message-information
         run: |
+          ls
           source .github/scripts/utils.sh
           echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
       - name: Notification to telegram
