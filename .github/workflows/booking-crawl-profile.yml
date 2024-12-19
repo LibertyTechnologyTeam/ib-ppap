@@ -70,7 +70,7 @@ jobs:
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          matrix_size=$(awk "BEGIN {print int(((${steps.script.outputs.length} + ${env.SIZE_PER_MATRIX} - 1) / ${env.SIZE_PER_MATRIX}))}")
+          matrix_size=$(awk "BEGIN {print int(((${{steps.script.outputs.length}} + ${{env.SIZE_PER_MATRIX}} - 1) / ${{env.SIZE_PER_MATRIX}}))}")
           matrix="["
           for ((i=0; i<$matrix_size; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
