@@ -23,7 +23,6 @@ jobs:
     outputs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
-      message: ${{ steps.message-information.outputs.value }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -31,17 +30,12 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
-      - name: Generate message
-        id: message-information
-        run: |
-          ls
-          source ./utils.sh
-          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+
       - name: Notification to telegram
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "🚀 Start Crawl Social Profile ${{ steps.message-information.outputs.value }}"
+          message: "🚀 Start Crawl Social Profile"
 
       # Generate a unique cache key
       - name: Generate cache key
