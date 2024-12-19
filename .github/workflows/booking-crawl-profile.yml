@@ -44,7 +44,7 @@ jobs:
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "🚀 Start Crawl Social Profile ${steps.message-information.outputs.value}"
+          message: "🚀 Start Crawl Social Profile. ${{steps.message-information.outputs.value}}"
 
       # Generate a unique cache key
       - name: Generate cache key
