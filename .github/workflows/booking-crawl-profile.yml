@@ -30,12 +30,17 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
+      - name: Get message
+        id: message-information
+        run: |
+          source ./scripts/utils.sh
+          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
 
       - name: Notification to telegram
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "🚀 Start Crawl Social Profile"
+          message: "🚀 Start Crawl Social Profile ${steps.message-information.outputs.value}"
 
       # Generate a unique cache key
       - name: Generate cache key
@@ -120,7 +125,6 @@ jobs:
           node --no-warnings main.js
   finish:
     needs: [get-profile-data, crawl-profiles]
-    if: ${{ needs.crawl-profiles.result == 'success' }}
     runs-on: ubuntu-latest
     name: Finish
     steps:
