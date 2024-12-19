@@ -52,7 +52,7 @@ jobs:
         id: calculate-matrix
         run: |
           matrix_size=$(echo "scale=0; (${{steps.script.outputs.length}} / ${{env.SIZE_PER_MATRIX}})" | bc)
-          echo "matrix_size=$matrix_size"
+          echo $matrix_size
           matrix="["
           for ((i=0; i<${{env.MATRIX_SIZE}}; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
