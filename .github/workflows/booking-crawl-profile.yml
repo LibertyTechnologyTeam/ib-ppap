@@ -38,7 +38,7 @@ jobs:
           cat ./scripts/utils.sh
           chmod +x ./scripts/utils.sh
           source ./scripts/utils.sh
-          message_info=$(get_message_information)
+          message_info=$(get_message_information "${{ env.PACKAGE_PATH }}")
           echo "value=$message_info" >> "$GITHUB_OUTPUT"
 
       - name: Notification to telegram
