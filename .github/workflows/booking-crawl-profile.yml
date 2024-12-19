@@ -34,6 +34,8 @@ jobs:
         id: message-information
         run: |
           ls
+          cat ./scripts/utils.sh
+          chmod +x ./scripts/utils.sh
           source ./scripts/utils.sh
           message_info=$(get_message_information)
           echo "value=$message_info" >> "$GITHUB_OUTPUT"
