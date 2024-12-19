@@ -38,10 +38,9 @@ jobs:
           source .github/scripts/utils.sh
           echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
       - name: Notification to telegram
-        uses: appleboy/telegram-action@master
+        uses: PacificPromise/macos-telegram-action@main
         with:
-          to: ${{ env.TELEGRAM_GROUP_ID }}
-          token: ${{ env.TELEGRAM_BOT_TOKEN }}
+          type: topic
           message: "🚀 Start Crawl Social Profile ${{ steps.message-information.outputs.value }}"
 
       # Generate a unique cache key
@@ -132,8 +131,8 @@ jobs:
     name: Finish
     steps:
       - name: Notification to telegram
-        uses: appleboy/telegram-action@master
+        uses: PacificPromise/macos-telegram-action@main
         with:
-          to: ${{ env.TELEGRAM_GROUP_ID }}
-          token: ${{ env.TELEGRAM_BOT_TOKEN }}
-          message: "🚀 - Finish get profile data... ${needs.get-profile-data.outputs.message}"
+          type: topic
+          message: "✅- Finish get profile data..."
+          # reply_to_message_id: ${{ env.TELEGRAM_TOPIC_ID }}
