@@ -1,10 +1,10 @@
 name: Project Influence  Schedule Save Crawler data
 on:
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: "Fill reason here!!!!!!"
-        required: false
+  # workflow_dispatch:
+  #   inputs:
+  #     reason:
+  #       description: "Fill reason here!!!!!!"
+  #       required: false
   repository_dispatch:
     types: [schedule_save_crawler_data]
 env:
@@ -23,6 +23,7 @@ jobs:
     outputs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
+      message: ${{ steps.message-information.outputs.value }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -136,5 +137,5 @@ jobs:
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "✅- Finish get profile data..."
+          message: "✅- Finish get profile data. ${{needs.get-profile-data.outputs.message}}"
           # reply_to_message_id: ${{ env.TELEGRAM_TOPIC_ID }}
