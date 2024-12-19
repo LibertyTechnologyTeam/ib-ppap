@@ -46,11 +46,12 @@ jobs:
         run: |
           echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           echo 'import { writeInputData } from "./src/write-input-data.js"; writeInputData(${{ env.SIZE }}, ${{ env.PACKAGE_PATH }});' > ./main.js
-          node --no-warnings ./main.js >> $GITHUB_OUTPUT
+          echo "length=$(node --no-warnings ./main.js)" >> $GITHUB_OUTPUT
+
       - name: Calculate matrix
         id: calculate-matrix
         run: |
-          echo "step: ${{ steps.script.outputs.index }}"
+          echo "step: ${{ steps.script.outputs.length }}"
           matrix="["
           for ((i=0; i<${{env.MATRIX_SIZE}}; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
