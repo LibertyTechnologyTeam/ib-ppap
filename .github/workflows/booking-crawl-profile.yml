@@ -33,9 +33,9 @@ jobs:
       - name: Get message
         id: message-information
         run: |
-          ls
-          source ./scripts/utils.sh
-          echo "value=$(get_message_information)" >> "$GITHUB_OUTPUT"
+          source .github/scripts/utils.sh
+          message_info=$(get_message_information)
+          echo "value=$message_info" >> "$GITHUB_OUTPUT"
 
       - name: Notification to telegram
         uses: PacificPromise/macos-telegram-action@main
