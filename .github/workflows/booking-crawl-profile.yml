@@ -37,7 +37,7 @@ jobs:
         id: get_crawl_type
         run: |
           if [[ "${{ env.CRAWL_TYPE }}" == "posts_crawl" ]]; then
-            echo "crawl_type=posts" >> $GITHUB_OUTPUT
+            echo "crawl_type=post" >> $GITHUB_OUTPUT
           else
             echo "crawl_type=profile" >> $GITHUB_OUTPUT
           fi
