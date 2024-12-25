@@ -91,6 +91,7 @@ jobs:
           path: |
             input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
           key: ${{ steps.generate-cache-key.outputs.key }}
+          restore-keys: ${{ runner.os }}-crawler-data-${{ github.sha }}
           # restore-keys: ${{ runner.os }}-crawler-data-
 
   crawl-profiles:
