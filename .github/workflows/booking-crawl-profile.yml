@@ -13,6 +13,7 @@ env:
   SIZE: ${{ github.event.client_payload.size }}
   PACKAGE_PATH: ${{ github.event.client_payload.package_path }}
   SIZE_PER_MATRIX: ${{ github.event.client_payload.size_per_matrix }}
+  CRAWL_TYPE: ${{ github.event.client_payload.crawl_type }}
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
   TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID }}
   TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID }}
@@ -24,6 +25,7 @@ jobs:
       cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
       message: ${{ steps.message-information.outputs.value }}
+      crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -31,6 +33,14 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
+      - name: Get Type Of Profile
+        id: get_crawl_type
+        run: |
+          if [[ "${{ env.CRAWL_TYPE }}" == "posts_crawl" ]]; then
+            echo "crawl_type=posts" >> $GITHUB_OUTPUT
+          else
+            echo "crawl_type=profile" >> $GITHUB_OUTPUT
+          fi
       - name: Get message
         id: message-information
         run: |
@@ -38,7 +48,7 @@ jobs:
           cat ./scripts/utils.sh
           chmod +x ./scripts/utils.sh
           source ./scripts/utils.sh
-          message_info=$(get_message_information "${{ env.PACKAGE_PATH }}" "${{ env.API_INFLUENCERS_URL }}")
+          message_info=$(get_message_information "${{ env.PACKAGE_PATH }}" "${{ env.API_INFLUENCERS_URL }}" "${{ steps.get_crawl_type.outputs.crawl_type }}")
           echo "value=$message_info" >> "$GITHUB_OUTPUT"
 
       - name: Notification to telegram
@@ -64,7 +74,7 @@ jobs:
         id: script
         run: |
           echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
-          echo 'import { writeInputData } from "./src/write-input-data.js"; writeInputData(${{ env.SIZE }}, ${{ env.PACKAGE_PATH }});' > ./main.js
+          echo 'import { writeInputData } from "./src/write-input-${{ steps.get_crawl_type.outputs.crawl_type }}.js"; writeInputData(${{ env.SIZE }}, ${{ env.PACKAGE_PATH }});' > ./main.js
           echo "length=$(node --no-warnings ./main.js)" >> $GITHUB_OUTPUT
 
       - name: Calculate matrix
@@ -79,7 +89,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            input_influencers_all.json
+            input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
           key: ${{ steps.generate-cache-key.outputs.key }}
           # restore-keys: ${{ runner.os }}-crawler-data-
 
@@ -125,7 +135,7 @@ jobs:
       - name: Run crawl profile
         run: |
           echo "platform=${{ matrix.index }}"
-          echo 'import { writeOutputByIndex } from "./src/write-output-data.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
+          echo 'import { writeOutputByIndex } from "./src/write-output-${{ needs.get-profile-data.outputs.crawl_type }}.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
           echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           node --no-warnings main.js
   finish:
@@ -137,7 +147,7 @@ jobs:
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "✅- Finish get profile data. ${{needs.get-profile-data.outputs.message}}"
+          message: "✅- Finish crawl data. ${{needs.get-profile-data.outputs.message}}"
   failure:
     needs: [get-profile-data, crawl-profiles]
     if: ${{ failure() }}
@@ -148,4 +158,4 @@ jobs:
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "❌- Error occurred in get profile data. ${{needs.get-profile-data.outputs.message}}"
+          message: "❌- Error occurred in crawl data. ${{needs.get-profile-data.outputs.message}}"
