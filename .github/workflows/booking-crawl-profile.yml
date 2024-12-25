@@ -33,7 +33,7 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
-      - name: Get Type Of Profile
+      - name: Generate Crawl Type
         id: get_crawl_type
         run: |
           if [[ "${{ env.CRAWL_TYPE }}" == "posts_crawl" ]]; then
@@ -121,7 +121,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            input_influencers_all.json
+            input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
           key: ${{ needs.get-profile-data.outputs.cache-key }}
 
       - name: Setup Node.js
