@@ -26,7 +26,6 @@ jobs:
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
       message: ${{ steps.message-information.outputs.value }}
       crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
-      text_data: ${{ steps.print-text-data.outputs.data }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -86,11 +85,11 @@ jobs:
           for ((i=0; i<$matrix_size; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-      - name: Print text Data
-        id: print-text-data
-        run: |
-          json_data=$(cat input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json | jq -c .)
-          echo "data=$json_data" >> $GITHUB_OUTPUT
+      - name: Save JSON file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: input-json
+          path: ./input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
       # - name: Cache crawler data
       #   uses: actions/cache@v3
       #   with:
@@ -127,10 +126,16 @@ jobs:
       #       input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
       #     key: ${{ needs.get-profile-data.outputs.cache-key }}
 
-      - name: Print text Data
-        id: print-text-data
+      - name: Download JSON file artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: input-json
+          path: ./ # Specify the directory where you want to download the file
+
+      - name: Verify JSON file
         run: |
-          echo "${{ needs.get-profile-data.outputs.text_data }}" > ./input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
+          cat ./input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
