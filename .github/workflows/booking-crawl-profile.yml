@@ -122,6 +122,11 @@ jobs:
           echo 'import { writeOutputByIndex } from "./src/write-output-${{ needs.get-profile-data.outputs.crawl_type }}.js"; writeOutputByIndex(${{ matrix.index }}, ${{ env.SIZE_PER_MATRIX }});' > ./main.js
           echo "API_INFLUENCERS_URL=${{ env.API_INFLUENCERS_URL }}" >> .env
           node --no-warnings main.js
+      - name: upload result JSON file artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: output-json
+          path: ./output_${{ matrix.index }}.json
   finish:
     needs: [get-profile-data, crawl-profiles]
     runs-on: ubuntu-latest
