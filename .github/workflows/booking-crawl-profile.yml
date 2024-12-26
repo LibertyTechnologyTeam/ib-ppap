@@ -89,7 +89,8 @@ jobs:
       - name: Print text Data
         id: print-text-data
         run: |
-          echo "data=$(cat input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json)" >> $GITHUB_OUTPUT
+          json_data=$(cat input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json | jq -c .)
+          echo "data=$json_data" >> $GITHUB_OUTPUT
       # - name: Cache crawler data
       #   uses: actions/cache@v3
       #   with:
