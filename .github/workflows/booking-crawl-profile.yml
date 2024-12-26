@@ -104,6 +104,11 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: "main"
 
+      - name: Download JSON file artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: input-json
+          path: ./ # Specify the directory where you want to download the file
       - name: Verify JSON file
         run: |
           cat ./input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
