@@ -22,7 +22,6 @@ jobs:
     name: Get Profile Input Data
     runs-on: ubuntu-latest
     outputs:
-      # cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
       message: ${{ steps.message-information.outputs.value }}
       crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
@@ -57,12 +56,6 @@ jobs:
           type: topic
           message: "🚀 Start Crawl Social Profile. ${{steps.message-information.outputs.value}}"
 
-      # Generate a unique cache key
-      # - name: Generate cache key
-      #   id: generate-cache-key
-      #   run: |
-      #     echo "key=${{ runner.os }}-crawler-data-${{ github.sha }}" >> $GITHUB_OUTPUT
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -90,14 +83,6 @@ jobs:
         with:
           name: input-json
           path: ./input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
-      # - name: Cache crawler data
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
-      #     key: ${{ steps.generate-cache-key.outputs.key }}
-      #     restore-keys: ${{ runner.os }}-crawler-data-${{ github.sha }}
-      #     # restore-keys: ${{ runner.os }}-crawler-data-
 
   crawl-profiles:
     needs: get-profile-data
@@ -118,19 +103,6 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
-
-      # - name: Restore crawler data
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
-      #     key: ${{ needs.get-profile-data.outputs.cache-key }}
-
-      - name: Download JSON file artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: input-json
-          path: ./ # Specify the directory where you want to download the file
 
       - name: Verify JSON file
         run: |
