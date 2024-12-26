@@ -22,10 +22,11 @@ jobs:
     name: Get Profile Input Data
     runs-on: ubuntu-latest
     outputs:
-      cache-key: ${{ steps.generate-cache-key.outputs.key }}
+      # cache-key: ${{ steps.generate-cache-key.outputs.key }}
       matrix: ${{ steps.calculate-matrix.outputs.matrix }}
       message: ${{ steps.message-information.outputs.value }}
       crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
+      text_data: ${{ steps.print-text-data.outputs.data }}
     steps:
       - name: Clone repository
         uses: actions/checkout@v3
@@ -58,10 +59,10 @@ jobs:
           message: "🚀 Start Crawl Social Profile. ${{steps.message-information.outputs.value}}"
 
       # Generate a unique cache key
-      - name: Generate cache key
-        id: generate-cache-key
-        run: |
-          echo "key=${{ runner.os }}-crawler-data-${{ github.sha }}" >> $GITHUB_OUTPUT
+      # - name: Generate cache key
+      #   id: generate-cache-key
+      #   run: |
+      #     echo "key=${{ runner.os }}-crawler-data-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -85,14 +86,18 @@ jobs:
           for ((i=0; i<$matrix_size; i++)); do matrix+="\"$i\", "; done
           matrix+="]"
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-      - name: Cache crawler data
-        uses: actions/cache@v3
-        with:
-          path: |
-            input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
-          key: ${{ steps.generate-cache-key.outputs.key }}
-          restore-keys: ${{ runner.os }}-crawler-data-${{ github.sha }}
-          # restore-keys: ${{ runner.os }}-crawler-data-
+      - name: Print text Data
+        id: print-text-data
+        run: |
+          echo "data=$(cat input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json)" >> $GITHUB_OUTPUT
+      # - name: Cache crawler data
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       input_influencers_${{ steps.get_crawl_type.outputs.crawl_type }}.json
+      #     key: ${{ steps.generate-cache-key.outputs.key }}
+      #     restore-keys: ${{ runner.os }}-crawler-data-${{ github.sha }}
+      #     # restore-keys: ${{ runner.os }}-crawler-data-
 
   crawl-profiles:
     needs: get-profile-data
@@ -113,18 +118,18 @@ jobs:
           repository: "InfluenceBooking/crawler"
           token: ${{ secrets.GH_PAT }}
           ref: "main"
-      - name: Get cache key
-        id: get-cache-key
+
+      # - name: Restore crawler data
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
+      #     key: ${{ needs.get-profile-data.outputs.cache-key }}
+
+      - name: Print text Data
+        id: print-text-data
         run: |
-          echo "cache-key=${{ needs.get-profile-data.outputs.cache-key }}" >> $GITHUB_OUTPUT
-
-      - name: Restore crawler data
-        uses: actions/cache@v3
-        with:
-          path: |
-            input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
-          key: ${{ needs.get-profile-data.outputs.cache-key }}
-
+          echo "${{ needs.get-profile-data.outputs.text_data }}" > ./input_influencers_${{ needs.get-profile-data.outputs.crawl_type }}.json
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
