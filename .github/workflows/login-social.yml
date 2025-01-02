@@ -1,0 +1,47 @@
+name: Project Influence  Schedule Check Section And Login
+
+on:
+  repository_dispatch:
+    types: [schedule_check_section_and_login]
+env:
+  GH_PAT: ${{ secrets.GH_PAT }}
+  CRAWL_TYPE: ${{ github.event.client_payload.crawl_type }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID }}
+  TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID }}
+jobs:
+  check-section-and-login:
+    name: Check Section And Login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
+      - name: Check Section And Login
+        run: |
+          echo "Check Section And Login"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.10.0"
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install otplib
+      - name: Run script
+        run: |
+          node ./src/login.js
+      - name: Push changed
+        run: |
+          git add .
+          git commit -m "Check Section And Login"
+          git push
+      - name: Notification to telegram
+        if: failure()
+        uses: PacificPromise/macos-telegram-action@main
+        with:
+          type: topic
+          message: "❌- Error Check Section And Login Social. /n ACTION: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
