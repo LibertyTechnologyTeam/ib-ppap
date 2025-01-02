@@ -1,14 +1,12 @@
 name: Project Influence  Schedule Check Section And Login
-
 on:
-  repository_dispatch:
+  workflow_dispatch:
     inputs:
       reason:
         description: "Fill reason here!!!!!!"
         required: false
 env:
   GH_PAT: ${{ secrets.GH_PAT }}
-  CRAWL_TYPE: ${{ github.event.client_payload.crawl_type }}
   TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
   TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID }}
   TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID }}
