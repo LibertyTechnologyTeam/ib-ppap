@@ -1,5 +1,7 @@
 name: Project Influence  Schedule Check Section And Login
 on:
+  schedule:
+    - cron: "0 0 */3 * *" # At 00:00 every 3rd day
   workflow_dispatch:
     inputs:
       reason:
