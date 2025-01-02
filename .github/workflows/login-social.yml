@@ -2,7 +2,10 @@ name: Project Influence  Schedule Check Section And Login
 
 on:
   repository_dispatch:
-    types: [schedule_check_section_and_login]
+    inputs:
+      reason:
+        description: "Fill reason here!!!!!!"
+        required: false
 env:
   GH_PAT: ${{ secrets.GH_PAT }}
   CRAWL_TYPE: ${{ github.event.client_payload.crawl_type }}
