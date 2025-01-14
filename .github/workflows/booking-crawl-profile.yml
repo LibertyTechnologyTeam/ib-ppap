@@ -26,6 +26,12 @@ jobs:
       message: ${{ steps.message-information.outputs.value }}
       crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
       - name: Generate Crawl Type
         id: get_crawl_type
         run: |
@@ -46,12 +52,7 @@ jobs:
         with:
           type: topic
           message: "🚀 Start Crawl Social Profile. ${{steps.message-information.outputs.value}}"
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          repository: "InfluenceBooking/crawler"
-          token: ${{ secrets.GH_PAT }}
-          ref: "main"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -145,15 +146,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Failure
     steps:
-      - name: generate message
-        id: message-generation
-        run: |
-          source ./scripts/utils.sh
-          message_info=$(get_message_information "${{ env.PACKAGE_PATH }}" "${{ env.API_INFLUENCERS_URL }}" "${{ env.CRAWL_TYPE }}")
-          echo "value=$message_info" >> "$GITHUB_OUTPUT"
-
       - name: Notification to telegram
         uses: PacificPromise/macos-telegram-action@main
         with:
           type: topic
-          message: "❌- Error occurred in crawl data. ${{steps.message-generation.outputs.value}}"
+          message: "❌- Error occurred in crawl data. ${{needs.get-profile-data.outputs.message}}"
