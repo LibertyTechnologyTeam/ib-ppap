@@ -26,12 +26,6 @@ jobs:
       message: ${{ steps.message-information.outputs.value }}
       crawl_type: ${{ steps.get_crawl_type.outputs.crawl_type }}
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          repository: "InfluenceBooking/crawler"
-          token: ${{ secrets.GH_PAT }}
-          ref: "main"
       - name: Generate Crawl Type
         id: get_crawl_type
         run: |
@@ -55,7 +49,12 @@ jobs:
         with:
           type: topic
           message: "🚀 Start Crawl Social Profile. ${{steps.message-information.outputs.value}}"
-
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          repository: "InfluenceBooking/crawler"
+          token: ${{ secrets.GH_PAT }}
+          ref: "main"
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
