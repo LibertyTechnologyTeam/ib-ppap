@@ -128,7 +128,7 @@ jobs:
       - name: upload result JSON file artifact
         uses: actions/upload-artifact@v4
         with:
-          name: output-json
+          name: output-json(${{ matrix.index }})
           path: ./output_${{ matrix.index }}.json
   finish:
     needs: [get-profile-data, crawl-profiles]
